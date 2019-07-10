@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+IFS=$'\n\t'
+
+dir=$(cd $(dirname "${BASH_SOURCE[0]}")/../ && pwd)
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+cd $dir
+
+docker-compose up --detach
+
+docker-compose run --rm drush --root=/app make --working-copy https://raw.githubusercontent.com/os2loop/profile/master/drupal.make /app/web
+
+cat <<'EOF' >| web/sites/default/settings.php
+<?php
+
+$databases['default']['default'] = [
+  'database' => 'db',
+  'username' => 'db',
+  'password' => 'db',
+  'host' => 'mariadb',
+  'port' => '',
+  'driver' => 'mysql',
+  'prefix' => '',
+];
+EOF
+
+docker-compose run --rm drush --root=/app/web --uri="http://os2loop.docker.localhost:$(docker-compose port reverse-proxy 80 | cut -d: -f2)" user-login
