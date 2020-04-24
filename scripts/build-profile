@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -o errexit -o errtrace -o noclobber -o nounset -o pipefail
+IFS=$'\n\t'
+
+script_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+dir=$(cd $(dirname "${BASH_SOURCE[0]}")/../web && pwd)
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+set -x
+
+build_dir=$script_dir/build
+rm -fr $build_dir
+# mkdir -p $build_dir
+
+cd $dir
+# Build Drupal core
+symfony php ../vendor/bin/drush make --working-copy --contrib-destination=profiles/loopdk profiles/loopdk/drupal.make $build_dir
+# Build profile
+symfony php ../vendor/bin/drush make --no-core --working-copy --contrib-destination=profiles/loopdk profiles/loopdk/loopdk.make $build_dir
+
+# rsync -azv $build_dir/ $dir

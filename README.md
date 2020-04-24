@@ -15,16 +15,17 @@ $databases['default']['default'] = [
   'driver' => 'mysql',
   'prefix' => '',
 ];
+EOF
 
 echo http://0.0.0.0:$(docker-compose port nginx 80 | cut -d: -f2)
-echo http://os2loop.docker.localhost:$(docker-compose port reverse-proxy 80 | cut -d: -f2)
+echo http://os2loop.local.computer:$(docker-compose port reverse-proxy 80 | cut -d: -f2)
 ```
 
 ## Running `drush`
 
 ```sh
 docker-compose run --rm drush --root=/app/web --uri="http://0.0.0.0:$(docker-compose port nginx 80 | cut -d: -f2)"
-docker-compose run --rm drush --root=/app/web --uri="http://os2loop.docker.localhost:$(docker-compose port reverse-proxy 80 | cut -d: -f2)" user-login
+docker-compose run --rm drush --root=/app/web --uri="http://os2loop.local.computer:$(docker-compose port reverse-proxy 80 | cut -d: -f2)" user-login
 ```
 
 

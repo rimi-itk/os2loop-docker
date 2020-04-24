@@ -1,2 +1,4 @@
 build/
 web/
+vendor
+.env.local
